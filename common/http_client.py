@@ -35,3 +35,6 @@ class HttpClient:
 
     def delete(self, path, **kwargs):
         return self._request('DELETE', path, **kwargs)
+
+    def put(self, path, **kwargs):
+        return self._request('PUT', path, **kwargs)

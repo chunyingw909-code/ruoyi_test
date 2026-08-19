@@ -14,3 +14,8 @@ class UserApi:
 
     def delete_user(self, user_id):
         return self.client.delete(f'/system/user/{user_id}')
+
+    def update_user(self, user_id, **kwargs):
+        payload = {'userId': user_id}
+        payload.update(kwargs)
+        return self.client.put('/system/user', json=payload)

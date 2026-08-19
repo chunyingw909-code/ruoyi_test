@@ -7,6 +7,7 @@ from pages.login_page import LoginPage
 from pages.user_page import UserPage
 from api.user_api import UserApi
 import os
+import time
 import logging
 logging.basicConfig(level=logging.INFO)
 config = read_yaml('config/config.yaml')
@@ -59,6 +60,18 @@ def cleanup_user(login_token):
         result = api.list_user(name)
         if result['rows']:
             api.delete_user(result['rows'][0]['userId'])
+
+@pytest.fixture
+def create_user(login_token):
+    api = UserApi(login_token)
+    username = f'del_test_{int(time.time())}'
+    api.add_user(username, '待删除用户')
+    result = api.list_user(username)
+    user_id = result['rows'][0]['userId']
+    yield {'username': username, 'user_id': user_id}
+    check = api.list_user(username)
+    if check['rows']:
+        api.delete_user(user_id)
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
 def pytest_runtest_makereport(item, call):

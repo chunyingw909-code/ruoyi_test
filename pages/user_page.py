@@ -8,6 +8,8 @@ class UserPage:
         self.dialog_nickname = self.dialog.get_by_placeholder('请输入用户昵称')
         self.dialog_username = self.dialog.get_by_placeholder('请输入用户名称')
         self.dialog_confirm = self.dialog.get_by_role('button', name='确 定')
+        self.dialog_form_error = self.dialog.locator('.el-form-item__error')
+        self.msg_error = self.page.locator('.el-message__content')
 
         self.search_input = self.page.locator('.el-form--inline').get_by_placeholder('请输入用户名称')
         self.search_button = self.page.get_by_role('button', name='搜索')

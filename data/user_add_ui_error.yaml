@@ -1,0 +1,17 @@
+- desc: 用户名为空
+  username: ""
+  nickname: 测试用户
+  error_type: form
+  expect: 用户名称不能为空
+
+- desc: 昵称为空
+  username: test_empty_nick
+  nickname: ""
+  error_type: form
+  expect: 用户昵称不能为空
+
+- desc: 用户名重复
+  username: admin
+  nickname: 重复测试
+  error_type: msg
+  expect: 新增用户'admin'失败，登录账号已存在

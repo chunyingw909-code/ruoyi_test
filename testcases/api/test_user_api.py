@@ -13,6 +13,11 @@ def test_add_user(case, login_token, cleanup_user):
     result = api.add_user(case['userName'], case['nickName'])
     assert result['code'] == case['expected_code']
 
+def test_delete_user(login_token, create_user):
+    api = UserApi(login_token)
+    result = api.delete_user(create_user['user_id'])
+    assert result['code'] == 200
+
 
 
 
