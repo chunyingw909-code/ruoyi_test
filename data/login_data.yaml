@@ -1,0 +1,14 @@
+- desc: 正确账号密码登录
+  username: admin
+  password: admin123
+  expected_code: 200
+
+- desc: 密码错误
+  username: admin
+  password: "111111"
+  expected_code: 500
+
+- desc: 用户名为空
+  username: ""
+  password: admin123
+  expected_code: 500

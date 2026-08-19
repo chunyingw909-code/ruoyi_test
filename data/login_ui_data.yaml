@@ -1,0 +1,17 @@
+- desc: 正确账号登录
+  username: admin
+  password: admin123
+  scene: success
+  expect: " 若依"
+
+- desc: 密码错误
+  username: admin
+  password: "111111"
+  scene: msg_error
+  expect: 用户不存在/密码错误
+
+- desc: 用户名为空
+  username: ""
+  password: admin123
+  scene: form_error
+  expect: 请输入您的账号

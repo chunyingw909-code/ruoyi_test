@@ -1,0 +1,19 @@
+- desc: 正常新增用户
+  userName: auto_test_user01
+  nickName: 自动测试01
+  expected_code: 200
+
+- desc: 用户名为空
+  userName: ""
+  nickName: 自动测试02
+  expected_code: 500
+
+- desc: 昵称为空
+  userName: auto_test_user03
+  nickName: ""
+  expected_code: 500
+
+- desc: 用户名重复
+  userName: admin
+  nickName: 重复测试
+  expected_code: 500
