@@ -1,16 +1,8 @@
-import requests
-from common.utils import read_yaml
+from common.http_client import HttpClient
 
-
-
-class LoginApi():
+class LoginApi:
     def __init__(self):
-        config = read_yaml('config/config.yaml')
-        self.base_url=config['base_url']
+        self.client = HttpClient()
 
-
-    def login(self,username,password):
-        payload = {'username': username, 'password': password}
-        r = requests.post(self.base_url+'/login',json=payload)
-
-        return r.json()
+    def login(self, username, password):
+        return self.client.post('/login', json={'username': username, 'password': password})
