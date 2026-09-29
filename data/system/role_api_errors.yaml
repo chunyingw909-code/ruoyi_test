@@ -1,0 +1,9 @@
+- desc: 角色名称为空
+  role_name: ''
+  role_key: autotest_blank_name
+  expect: 角色名称不能为空
+
+- desc: 权限字符为空
+  role_name: AUTOTEST-role-blank-key
+  role_key: ''
+  expect: 权限字符不能为空

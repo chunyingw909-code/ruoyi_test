@@ -1,5 +1,8 @@
 .venv/
 __pycache__/
 allure-results/
+allure-report/
 *.pyc
 .idea
+node_modules/
+system-under-test/

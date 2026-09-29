@@ -1,0 +1,133 @@
+name: RuoYi automation CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: '0 18 * * *'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: ruoyi-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      BASE_URL: http://localhost:8080
+      UI_URL: http://localhost:81
+      ADMIN_USERNAME: admin
+      ADMIN_PASSWORD: admin123
+      CI: '1'
+
+    steps:
+      - name: Checkout tests
+        uses: actions/checkout@v4
+
+      - name: Checkout pinned RuoYi source
+        shell: bash
+        run: |
+          git init system-under-test
+          git -C system-under-test remote add origin https://gitee.com/y_project/RuoYi-Vue.git
+          git -C system-under-test fetch --depth 1 origin 41720e624c5a668c7d3777835e4c87095a7a1dfd
+          git -C system-under-test checkout --detach FETCH_HEAD
+
+      - name: Start isolated RuoYi environment
+        run: docker compose -f compose.ci.yml up -d --build
+
+      - name: Wait for backend and frontend
+        shell: bash
+        run: |
+          for attempt in {1..90}; do
+            if curl --fail --silent http://localhost:8080/captchaImage > /dev/null \
+              && curl --fail --silent http://localhost:81/ > /dev/null; then
+              exit 0
+            fi
+            sleep 5
+          done
+          docker compose -f compose.ci.yml logs --no-color
+          exit 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: pip
+
+      - name: Install test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          python -m playwright install --with-deps chromium
+
+      - name: Run API tests
+        run: python -m pytest testcases/api -q
+
+      - name: Run UI tests
+        run: python -m pytest testcases/ui -q
+
+      - name: Save Docker logs
+        if: always()
+        shell: bash
+        run: docker compose -f compose.ci.yml logs --no-color > docker-compose.log
+
+      - name: Upload Allure results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results
+          path: allure-results/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Upload Docker logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-logs
+          path: docker-compose.log
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Stop isolated environment
+        if: always()
+        run: docker compose -f compose.ci.yml down -v
+
+  deploy-report:
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    needs: test
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Download Allure results
+        uses: actions/download-artifact@v4
+        with:
+          name: allure-results
+          path: allure-results
+
+      - name: Install Allure
+        run: npm install --global allure-commandline@2.34.1
+
+      - name: Generate Allure report
+        run: allure generate allure-results --clean --output allure-report
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: allure-report
+
+      - name: Deploy report to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

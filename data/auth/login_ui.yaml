@@ -1,0 +1,27 @@
+- desc: 密码错误
+  username: admin
+  password: "111111"
+  error_type: message
+  expect: 用户不存在/密码错误
+
+- desc: 用户名为空
+  username: ""
+  password: admin123
+  error_type: form
+  expect:
+    - 请输入您的账号
+
+- desc: 密码为空
+  username: admin
+  password: ""
+  error_type: form
+  expect:
+    - 请输入您的密码
+
+- desc: 用户名和密码都为空
+  username: ""
+  password: ""
+  error_type: form
+  expect:
+    - 请输入您的账号
+    - 请输入您的密码

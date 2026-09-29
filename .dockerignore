@@ -1,0 +1,12 @@
+.git
+.github
+.venv
+allure-results
+allure-report
+node_modules
+__pycache__
+*.pyc
+ruoyi_test.zip
+system-under-test/.git
+system-under-test/ruoyi-ui/node_modules
+system-under-test/**/target

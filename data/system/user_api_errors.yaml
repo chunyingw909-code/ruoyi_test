@@ -1,0 +1,14 @@
+- desc: 用户名为空
+  username: ""
+  nickname: 自动测试用户
+  expected_code: 500
+
+- desc: 昵称为空
+  username: __unique__
+  nickname: ""
+  expected_code: 500
+
+- desc: 用户名重复
+  username: admin
+  nickname: 重复测试
+  expected_code: 500

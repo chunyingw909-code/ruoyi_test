@@ -5,7 +5,7 @@
   expect: 用户名称不能为空
 
 - desc: 昵称为空
-  username: test_empty_nick
+  username: __unique__
   nickname: ""
   error_type: form
   expect: 用户昵称不能为空

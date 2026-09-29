@@ -1,0 +1,51 @@
+- desc: 密码错误
+  payload:
+    username: admin
+    password: "111111"
+  expected_code: 500
+  expected_message: 用户不存在/密码错误
+
+- desc: 用户不存在
+  payload:
+    username: AUTOTEST-not-exists
+    password: admin123
+  expected_code: 500
+  expected_message: 用户不存在/密码错误
+
+- desc: 用户名为空字符串
+  payload:
+    username: ""
+    password: admin123
+  expected_code: 500
+  expected_message: 用户不存在/密码错误
+
+- desc: 密码为空字符串
+  payload:
+    username: admin
+    password: ""
+  expected_code: 500
+  expected_message: 用户不存在/密码错误
+
+- desc: 用户名和密码都为空
+  payload:
+    username: ""
+    password: ""
+  expected_code: 500
+  expected_message: 用户不存在/密码错误
+
+- desc: 缺少用户名字段
+  payload:
+    password: admin123
+  expected_code: 500
+  expected_message: 用户不存在/密码错误
+
+- desc: 缺少密码字段
+  payload:
+    username: admin
+  expected_code: 500
+  expected_message: 用户不存在/密码错误
+
+- desc: 空JSON对象
+  payload: {}
+  expected_code: 500
+  expected_message: 用户不存在/密码错误

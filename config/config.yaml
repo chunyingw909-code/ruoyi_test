@@ -1,5 +1,6 @@
 base_url: http://localhost:8080
 ui_url: http://localhost:81
+request_timeout: 10
 admin:
   username: admin
   password: admin123
