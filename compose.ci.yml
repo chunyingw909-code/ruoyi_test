@@ -11,6 +11,7 @@ services:
     volumes:
       - ./system-under-test/sql/ry_20260417.sql:/docker-entrypoint-initdb.d/01-ruoyi.sql:ro
       - ./system-under-test/sql/quartz.sql:/docker-entrypoint-initdb.d/02-quartz.sql:ro
+      - ./ci/docker/03-ci-overrides.sql:/docker-entrypoint-initdb.d/03-ci-overrides.sql:ro
     healthcheck:
       test: [CMD-SHELL, mysqladmin ping -h localhost -pci_mysql_password --silent]
       interval: 5s
