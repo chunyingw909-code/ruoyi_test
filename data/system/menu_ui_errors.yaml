@@ -1,0 +1,4 @@
+- desc: 菜单名称为空
+  menu_name: ''
+  path: autotest-ui-invalid-name
+  expect: 菜单名称不能为空

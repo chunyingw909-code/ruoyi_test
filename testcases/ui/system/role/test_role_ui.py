@@ -147,7 +147,7 @@ def test_change_role_data_scope(role_page, role_api, seeded_ui_role):
 
     role_page.data_scope_menu_item.click()
     expect(role_page.data_scope_dialog).to_be_visible()
-    role_page.data_scope_input.click()
+    role_page.data_scope_select.click()
     role_page.self_data_scope_option.click()
     with role_page.page.expect_response(
         lambda response: '/system/role/dataScope' in response.url

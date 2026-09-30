@@ -1,0 +1,9 @@
+- desc: 公告标题为空
+  notice_title: ''
+  notice_type: 通知
+  expect: 公告标题不能为空
+
+- desc: 公告类型为空
+  notice_title: AUTOTEST-notice-ui-blank-type
+  notice_type: ''
+  expect: 公告类型不能为空

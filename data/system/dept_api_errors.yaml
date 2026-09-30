@@ -1,0 +1,4 @@
+- desc: 部门名称为空
+  dept_name: ''
+  expected_code: 500
+  expected_message: 部门名称不能为空

@@ -1,0 +1,9 @@
+- desc: 字典标签为空
+  dict_label: ''
+  dict_value: autotest_blank_label
+  expect: 字典标签不能为空
+
+- desc: 字典键值为空
+  dict_label: AUTOTEST-label-blank-value
+  dict_value: ''
+  expect: 字典键值不能为空

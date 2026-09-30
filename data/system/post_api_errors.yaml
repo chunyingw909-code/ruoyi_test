@@ -1,0 +1,9 @@
+- desc: 岗位名称为空
+  post_name: ''
+  post_code: autotest_blank_name
+  expect: 岗位名称不能为空
+
+- desc: 岗位编码为空
+  post_name: AUTOTEST-post-blank-code
+  post_code: ''
+  expect: 岗位编码不能为空

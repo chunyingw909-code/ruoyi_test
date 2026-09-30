@@ -8,7 +8,11 @@ import pytest
 @pytest.fixture(autouse=True)
 def screenshot_on_failure(request, page):
     yield
-    if not (hasattr(request.node, 'rep_call') and request.node.rep_call.failed):
+    failed = any(
+        getattr(getattr(request.node, f'rep_{when}', None), 'failed', False)
+        for when in ('setup', 'call')
+    )
+    if not failed:
         return
     try:
         allure.attach(

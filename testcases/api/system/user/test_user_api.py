@@ -63,15 +63,20 @@ def test_add_and_list_user(user_api, unique_username, track_test_user):
 def test_add_user_validation(user_api, unique_username, track_test_user, case):
     username = unique_username if case['username'] == '__unique__' else case['username']
     try:
-        result = user_api.add_user(username, case['nickname'])
+        result = user_api.add_user(
+            username,
+            case['nickname'],
+            password=case['password'],
+        )
     finally:
         # 即使产品错误地创建了非法数据，也只登记并清理唯一 AUTOTEST 用户。
         if username.startswith('AUTOTEST-'):
             track_test_user(username)
 
-    # 断言：非法或重复的用户数据被业务层拒绝
+    # 断言：非法或重复的用户数据被业务层拒绝，且拒绝原因与场景一致
     assert result.status_code == 200, result
     assert result['code'] == case['expected_code'], result
+    assert result['msg'] == case['expected_message'], result
 
 
 @allure.feature('系统管理')

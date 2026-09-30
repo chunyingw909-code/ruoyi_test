@@ -1,3 +1,6 @@
+from common.ui import click_and_wait_list, row_operation_button, wait_dialog_settled
+
+
 class UserPage:
     """系统管理 / 用户管理页面对象。"""
 
@@ -29,12 +32,13 @@ class UserPage:
         self.table_body = self.table.locator('.el-table__body-wrapper tbody')
         self.table_usernames = self.table.locator('.link-type')
         self.pagination_total = page.locator('.el-pagination__total')
-        self.loading_mask = page.locator('.el-loading-mask')
+        self.loading_mask = page.locator('.el-table .el-loading-mask').first
 
         # 添加用户弹窗
         self.add_dialog = page.get_by_role('dialog', name='添加用户')
         self.add_nickname_input = self.add_dialog.get_by_placeholder('请输入用户昵称')
         self.add_username_input = self.add_dialog.get_by_placeholder('请输入用户名称')
+        self.add_password_input = self.add_dialog.get_by_placeholder('请输入用户密码')
         self.add_confirm_button = self.add_dialog.get_by_role('button', name='确 定')
         self.add_form_error = self.add_dialog.locator('.el-form-item__error')
 
@@ -71,36 +75,55 @@ class UserPage:
     def status_switch(self, username):
         return self.row_by_username(username).locator('.el-switch')
 
+    # .el-switch 容器自身就是可访问 switch，直接用于状态断言和点击
     def status_checkbox(self, username):
-        return self.status_switch(username).get_by_role('checkbox')
+        return self.status_switch(username)
 
-    # 搜索并等待用户列表接口完成
+    # 行内修改、删除是图标按钮，顺序与用户管理模板一致
+    def edit_row_button(self, username):
+        return row_operation_button(self.row_by_username(username), 0)
+
+    def delete_row_button(self, username):
+        return row_operation_button(self.row_by_username(username), 1)
+
+    # 只接受带上本次用户名的列表响应，避免吃到进页时的未筛选请求
     def search(self, username):
         self.search_username_input.fill(username)
-        with self.page.expect_response(
-            lambda response: '/system/user/list' in response.url
-        ):
-            self.search_button.click()
-        self.loading_mask.wait_for(state='hidden', timeout=5000)
+        click_and_wait_list(
+            self.page,
+            self.search_button,
+            self.loading_mask,
+            '/system/user/list',
+            {'userName': username},
+        )
 
     def reset_search(self):
-        with self.page.expect_response(
-            lambda response: '/system/user/list' in response.url
-        ):
-            self.reset_button.click()
-        self.loading_mask.wait_for(state='hidden', timeout=5000)
+        click_and_wait_list(
+            self.page,
+            self.reset_button,
+            self.loading_mask,
+            '/system/user/list',
+            {'userName': ''},
+        )
 
-    # 打开新增弹窗，填写必填字段并提交
-    def add_user(self, username, nickname):
+    # 密码是必填项，而且初始密码是异步填入的，提交前写死一个已知密码
+    def add_user(self, username, nickname, password='AutoTest123'):
         self.add_button.click()
+        self.add_dialog.wait_for(state='visible')
         self.add_nickname_input.fill(nickname)
         self.add_username_input.fill(username)
+        if password is not None:
+            self.add_password_input.fill(password)
         self.add_confirm_button.click()
+        wait_dialog_settled(
+            self.page,
+            self.add_dialog,
+            self.add_form_error,
+            self.message,
+        )
 
     def edit_nickname(self, username, nickname):
-        self.row_by_username(username).get_by_role(
-            'button', name='修改'
-        ).click()
+        self.edit_row_button(username).click()
         self.edit_dialog.wait_for(state='visible')
         self.edit_nickname_input.fill(nickname)
         with self.page.expect_response(
@@ -122,9 +145,7 @@ class UserPage:
         self.confirm_box.wait_for(state='hidden')
 
     def delete_user(self, username):
-        self.row_by_username(username).get_by_role(
-            'button', name='删除'
-        ).click()
+        self.delete_row_button(username).click()
         self.confirm_box.wait_for(state='visible')
         with self.page.expect_response(
             lambda response: (

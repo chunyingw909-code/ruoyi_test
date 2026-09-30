@@ -1,0 +1,11 @@
+- desc: 公告标题为空
+  notice_title: ''
+  expect: 公告标题不能为空
+
+- desc: 公告标题超过50个字符
+  notice_title: AUTOTEST-notice-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+  expect: 公告标题不能超过50个字符
+
+- desc: 公告标题包含脚本
+  notice_title: AUTOTEST-notice-<script>
+  expect: 公告标题不能包含脚本字符

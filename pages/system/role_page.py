@@ -1,3 +1,6 @@
+from common.ui import click_and_wait_list, row_operation_button, wait_dialog_settled
+
+
 class RolePage:
     """系统管理 / 角色管理页面对象。"""
 
@@ -28,7 +31,7 @@ class RolePage:
         self.table_headers = self.table.locator('thead')
         self.table_body = self.table.locator('.el-table__body-wrapper tbody')
         self.pagination_total = page.locator('.el-pagination__total')
-        self.loading_mask = page.locator('.el-loading-mask')
+        self.loading_mask = page.locator('.el-table .el-loading-mask').first
 
         # 新增角色弹窗
         self.add_dialog = page.get_by_role('dialog', name='添加角色')
@@ -55,15 +58,21 @@ class RolePage:
             'button', name='确 定'
         )
 
-        # 更多操作与数据权限弹窗
+        # 更多操作菜单
         self.data_scope_menu_item = page.get_by_text(
             '数据权限', exact=True
         ).filter(visible=True)
         self.assign_user_menu_item = page.get_by_text(
             '分配用户', exact=True
         ).filter(visible=True)
+
+        # 分配数据权限弹窗。权限范围下拉没有 placeholder，按表单项标签定位。
         self.data_scope_dialog = page.get_by_role('dialog', name='分配数据权限')
-        self.data_scope_input = self.data_scope_dialog.get_by_placeholder('请选择')
+        self.data_scope_select = self.data_scope_dialog.locator(
+            '.el-form-item'
+        ).filter(
+            has=page.get_by_text('权限范围', exact=True)
+        ).locator('.el-select')
         self.self_data_scope_option = page.get_by_text(
             '仅本人数据权限', exact=True
         ).filter(visible=True)
@@ -82,37 +91,57 @@ class RolePage:
     def status_switch(self, role_name):
         return self.row_by_role_name(role_name).locator('.el-switch')
 
+    # .el-switch 容器自身就是可访问 switch，直接用于状态断言和点击
     def status_checkbox(self, role_name):
-        return self.status_switch(role_name).get_by_role('checkbox')
+        return self.status_switch(role_name)
 
-    # 按角色名称搜索并等待列表接口完成
+    # 行内是修改、删除和更多三个图标按钮
+    def edit_row_button(self, role_name):
+        return row_operation_button(self.row_by_role_name(role_name), 0)
+
+    def delete_row_button(self, role_name):
+        return row_operation_button(self.row_by_role_name(role_name), 1)
+
+    def more_row_button(self, role_name):
+        return row_operation_button(self.row_by_role_name(role_name), 2)
+
+    # 只接受带上本次角色名的列表响应，避免吃到进页时的未筛选请求
     def search(self, role_name):
         self.search_role_name_input.fill(role_name)
-        with self.page.expect_response(
-            lambda response: '/system/role/list' in response.url
-        ):
-            self.search_button.click()
-        self.loading_mask.wait_for(state='hidden', timeout=5000)
+        click_and_wait_list(
+            self.page,
+            self.search_button,
+            self.loading_mask,
+            '/system/role/list',
+            {'roleName': role_name},
+        )
 
     def reset_search(self):
-        with self.page.expect_response(
-            lambda response: '/system/role/list' in response.url
-        ):
-            self.reset_button.click()
-        self.loading_mask.wait_for(state='hidden', timeout=5000)
+        click_and_wait_list(
+            self.page,
+            self.reset_button,
+            self.loading_mask,
+            '/system/role/list',
+            {'roleName': ''},
+        )
 
     # 填写新增角色的必填字段并提交
     def add_role(self, role_name, role_key, role_sort='10'):
         self.add_button.click()
+        self.add_dialog.wait_for(state='visible')
         self.add_role_name_input.fill(role_name)
         self.add_role_key_input.fill(role_key)
         self.add_role_sort_input.fill(role_sort)
         self.add_confirm_button.click()
+        wait_dialog_settled(
+            self.page,
+            self.add_dialog,
+            self.add_form_error,
+            self.message,
+        )
 
     def edit_role_name(self, role_name, new_role_name):
-        self.row_by_role_name(role_name).get_by_role(
-            'button', name='修改'
-        ).click()
+        self.edit_row_button(role_name).click()
         self.edit_dialog.wait_for(state='visible')
         self.edit_role_name_input.fill(new_role_name)
         with self.page.expect_response(
@@ -134,9 +163,7 @@ class RolePage:
         self.confirm_box.wait_for(state='hidden')
 
     def delete_role(self, role_name):
-        self.row_by_role_name(role_name).get_by_role(
-            'button', name='删除'
-        ).click()
+        self.delete_row_button(role_name).click()
         self.confirm_box.wait_for(state='visible')
         with self.page.expect_response(
             lambda response: (
@@ -149,7 +176,5 @@ class RolePage:
 
     # 展开目标角色的更多操作菜单
     def open_more_actions(self, role_name):
-        self.row_by_role_name(role_name).get_by_role(
-            'button', name='更多'
-        ).click()
+        self.more_row_button(role_name).click()
         self.data_scope_menu_item.wait_for(state='visible')

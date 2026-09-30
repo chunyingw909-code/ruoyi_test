@@ -1,0 +1,5 @@
+- desc: 菜单名称为空
+  menu_name: ''
+  path: autotest-invalid-name
+  expected_code: 500
+  expected_message: 菜单名称不能为空

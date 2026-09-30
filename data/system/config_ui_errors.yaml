@@ -1,0 +1,17 @@
+- desc: 参数名称为空
+  config_name: ''
+  config_key: autotest_ui_blank_name
+  config_value: value
+  expect: 参数名称不能为空
+
+- desc: 参数键名为空
+  config_name: AUTOTEST-config-ui-blank-key
+  config_key: ''
+  config_value: value
+  expect: 参数键名不能为空
+
+- desc: 参数键值为空
+  config_name: AUTOTEST-config-ui-blank-value
+  config_key: autotest_ui_blank_value
+  config_value: ''
+  expect: 参数键值不能为空

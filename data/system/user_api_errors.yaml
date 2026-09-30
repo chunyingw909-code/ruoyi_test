@@ -1,14 +1,20 @@
 - desc: 用户名为空
   username: ""
   nickname: 自动测试用户
+  password: AutoTest123
   expected_code: 500
+  expected_message: 用户账号不能为空
 
-- desc: 昵称为空
-  username: __unique__
-  nickname: ""
+- desc: 用户名超长
+  username: AUTOTEST-name-that-is-way-too-long
+  nickname: 自动测试用户
+  password: AutoTest123
   expected_code: 500
+  expected_message: 用户账号长度不能超过30个字符
 
 - desc: 用户名重复
   username: admin
   nickname: 重复测试
+  password: AutoTest123
   expected_code: 500
+  expected_message: 新增用户'admin'失败，登录账号已存在

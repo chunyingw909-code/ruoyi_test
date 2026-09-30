@@ -1,0 +1,17 @@
+- desc: 数据标签为空
+  dict_label: ''
+  dict_value: autotest_ui_blank_label
+  sort: '1'
+  expect: 数据标签不能为空
+
+- desc: 数据键值为空
+  dict_label: AUTOTEST-label-ui-blank-value
+  dict_value: ''
+  sort: '1'
+  expect: 数据键值不能为空
+
+- desc: 显示排序为空
+  dict_label: AUTOTEST-label-ui-blank-sort
+  dict_value: autotest_ui_blank_sort
+  sort: ''
+  expect: 数据顺序不能为空

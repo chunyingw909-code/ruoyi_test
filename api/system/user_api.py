@@ -1,3 +1,5 @@
+import os
+
 from common.http_client import HttpClient
 
 
@@ -58,7 +60,7 @@ class UserApi:
                 params={'updateSupport': str(update_support).lower()},
                 files={
                     'file': (
-                        file.name.rsplit('\\', 1)[-1],
+                        os.path.basename(file_path),
                         file,
                         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
                     )
