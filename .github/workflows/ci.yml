@@ -7,7 +7,8 @@ on:
     branches: [main]
   workflow_dispatch:
   schedule:
-    - cron: '0 18 * * *'
+    # GitHub Actions 使用 UTC：北京时间 08:00、20:00
+    - cron: '0 0,12 * * *'
 
 permissions:
   contents: read
